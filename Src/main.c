@@ -46,7 +46,7 @@ static uint8_t majorFilter(EncoderState* eca, EncoderState* ecb);
 
 // init variables
 uint16_t tim14_psc = 0, tim14_arr = 0;
-int16_t vu_ccr_default = 118, vi_ccr_default = 45;
+int16_t vu_ccr_default = 118, vi_ccr_default = 290;
 int16_t vu_cntr = 0, vi_cntr = 0;
 uint8_t eca_btn_cntr = 0, ecb_btn_cntr = 0;
 uint16_t step_vals[2] = {1, 5};
