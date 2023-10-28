@@ -28,7 +28,7 @@
 #define EC2_Btn				GPIO_IDR_5
 
 #define MAJOR_FILT_AVG		5
-#define MAX_CNTR_VALUE		500
+#define MAX_CNTR_VALUE		800
 #define SCAN_PERIOD_US		100
 
 typedef struct
@@ -46,7 +46,7 @@ static uint8_t majorFilter(EncoderState* eca, EncoderState* ecb);
 
 // init variables
 uint16_t tim14_psc = 0, tim14_arr = 0;
-int16_t vu_ccr_default = 80, vi_ccr_default = 50;
+int16_t vu_ccr_default = 118, vi_ccr_default = 45;
 int16_t vu_cntr = 0, vi_cntr = 0;
 uint8_t eca_btn_cntr = 0, ecb_btn_cntr = 0;
 uint16_t step_vals[2] = {1, 5};
@@ -62,11 +62,11 @@ int main(void)
  	RCC->CR |= RCC_CR_HSEON|RCC_CR_HSEBYP; // HSE bypass clock init
 	while(!(RCC->CR & RCC_CR_HSERDY)){}
 #ifdef USE_PLL
-	RCC->CFGR |= RCC_CFGR_PLLMUL6|RCC_CFGR_PLLSRC_HSE_PREDIV|RCC_CFGR_PLLXTPRE_HSE_PREDIV_DIV1; //set PLL clock as system clock
+	RCC->CFGR |= RCC_CFGR_PLLMUL2|RCC_CFGR_PLLSRC_HSE_PREDIV|RCC_CFGR_PLLXTPRE_HSE_PREDIV_DIV1; //set PLL clock as system clock
 	RCC->CR |= RCC_CR_PLLON;
 	while(!(RCC->CR & RCC_CR_PLLRDY)){}
 	RCC->CFGR |= RCC_CFGR_SW_PLL;
-	tim14_psc = 47;
+	tim14_psc = 15;
 	tim14_arr = SCAN_PERIOD_US-1;
 #else
 	RCC->CFGR |= RCC_CFGR_SW_HSE; //set HSE clock as system clock
@@ -137,8 +137,8 @@ int main(void)
 				}
 
 				// handle encoder 1 state
-				// detect A signal change
-				if(enc_A.a_pin_state^enc_A.a_pin_state_prev)
+				// detect A signal rising edge
+				if(enc_A.a_pin_state && !enc_A.a_pin_state_prev)
 				{
 					// detect turn direction by A and B signal level
 					if(enc_A.a_pin_state == enc_A.b_pin_state)
@@ -163,8 +163,8 @@ int main(void)
 				}
 
 				// handle encoder 2 state
-				// detect A signal change
-				if(enc_B.a_pin_state^enc_B.a_pin_state_prev)
+				// detect A signal rising edge
+				if(enc_B.a_pin_state && !enc_B.a_pin_state_prev)
 				{
 					// detect turn direction by A and B signal level
 					if(enc_B.a_pin_state == enc_B.b_pin_state)
