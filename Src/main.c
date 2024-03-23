@@ -52,6 +52,7 @@ uint8_t eca_btn_cntr = 0, ecb_btn_cntr = 0;
 uint16_t step_vals[2] = {1, 5};
 
 volatile uint8_t is_update_event = 0;
+volatile uint8_t is_encoder_prev_state_got = 0;
 
 // init encoders state with default values
 EncoderState enc_A = {1, 1, 1, 1, 1, 1}, enc_B = {1, 1, 1, 1, 1, 1};
@@ -250,6 +251,20 @@ static uint8_t majorFilter(EncoderState* eca, EncoderState* ecb)
 		ecb->a_pin_state = (ec2a_cntr > MAJOR_FILT_AVG/2+1) ? 1 : 0;
 		ecb->b_pin_state = (ec2b_cntr > MAJOR_FILT_AVG/2+1) ? 1 : 0;
 		ecb->btn_state = (ec2_btn_cntr > MAJOR_FILT_AVG/2+1) ? 1 : 0;
+
+		if(!is_encoder_prev_state_got)
+		{
+			is_encoder_prev_state_got = 1;
+
+			// refresh previous encoders state
+			enc_A.btn_state_prev = enc_A.btn_state;
+			enc_A.a_pin_state_prev = enc_A.a_pin_state;
+			enc_A.b_pin_state_prev = enc_A.b_pin_state;
+
+			enc_B.btn_state_prev = enc_B.btn_state;
+			enc_B.a_pin_state_prev = enc_B.a_pin_state;
+			enc_B.b_pin_state_prev = enc_B.b_pin_state;
+		}
 
 		// reset counters
 		ec1a_cntr = ec1b_cntr = ec1_btn_cntr = 0;
